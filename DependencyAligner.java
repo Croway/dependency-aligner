@@ -1,5 +1,5 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
-//DEPS org.apache.maven.shared:maven-core:3.9.0
+//DEPS org.apache.maven:maven-core:3.9.0
 //DEPS org.apache.maven:maven-model:3.9.0
 //DEPS org.apache.maven:maven-settings:3.9.0
 
@@ -24,11 +24,6 @@ import java.util.stream.Collectors;
  * args[1] comma separated list of groupIds to remove (contains is used)
  */
 public class DependencyAligner {
-
-    private static final String[] GROUP_IDS = {
-            "org.springframework",
-            "com.github.ben-manes"
-    };
 
     public static void main(String[] args) throws Exception {
         Model model = null;

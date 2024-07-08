@@ -21,22 +21,37 @@ import java.util.stream.Collectors;
  * Remove dependency from an help:effective-pom
  *
  * args[0] pom.xml path
- * args[1] comma separated list of groupIds to remove (contains is used)
+ * args[1] comma separated list of groupIds to remove (contains is used) the format is groupId?:artifactId?:classifier
  */
 public class DependencyAligner {
 
     public static void main(String[] args) throws Exception {
         Model model = null;
         String pom = args[0];
-        String[] groupIds = args[1].split(",");
+        String[] artifacts = args[1].split(",");
         try (InputStream is = new FileInputStream(pom)) {
             model = new MavenXpp3Reader().read(is);
 
             Set<Dependency> dependenciesToRemove = model.getDependencies().stream()
                     .filter(dependency -> {
-                for (String groupId : groupIds) {
-                    if (dependency.getGroupId().contains(groupId)) {
-                        return true;
+                for (String artifact : artifacts) {
+                    String[] splitArtifact = artifact.split(":");
+
+                    if (splitArtifact.length == 1) {
+                        if (dependency.getGroupId().contains(splitArtifact[0])) {
+                            return true;
+                        }
+                    } else if (splitArtifact.length == 2) {
+                        if (dependency.getGroupId().contains(splitArtifact[0])
+                                && dependency.getArtifactId().contains(splitArtifact[1])) {
+                            return true;
+                        }
+                    } else if (splitArtifact.length == 3) {
+                        if (dependency.getClassifier() != null && dependency.getGroupId().contains(splitArtifact[0])
+                                && dependency.getArtifactId().contains(splitArtifact[1])
+                                && dependency.getClassifier().contains(splitArtifact[2])) {
+                            return true;
+                        }
                     }
                 }
 
